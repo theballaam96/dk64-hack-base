@@ -5,6 +5,11 @@ import zlib
 import subprocess
 import hashlib
 
+# DONKEY KONG 64 BUILDER
+# AKA "CRANKY'S LAB"
+# Built by Isotarge
+# https://twitter.com/isotarge
+
 # Measure how long this takes
 import time
 start_time = time.time()
