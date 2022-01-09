@@ -1,0 +1,28 @@
+# N64 ROM Files
+*.z64
+*.v64
+*.n64
+
+# Python
+*.pyc
+
+# Object Files
+*.o
+
+# Debugging Files
+*.bak
+*.bps
+*.wch
+*.sym
+maps/*
+codec_test/*
+
+# Image Files
+*.rgba5551
+*.i4
+*.i8
+*.ia4
+*.ia8
+
+# Log Files
+*.log
