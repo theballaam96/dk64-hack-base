@@ -28,7 +28,7 @@ with open('./asm/objects.asm', 'w') as obj_asm:
 				_o = os.path.join(root, file).replace("/", "_").replace("\\", "_").replace(".c", ".o")
 				print(os.path.join(root, file))
 				obj_asm.write(".importobj \"obj/" + _o + "\"\n")
-				subprocess.run(["mips64-elf-gcc", "-Wall", "-O1", "-mtune=vr4300", "-march=vr4300", "-mabi=32", "-fomit-frame-pointer", "-G0", "-c", os.path.join(root, file)])
+				subprocess.run(["mips64-elf-gcc", "-w", "-Wall", "-O1", "-mtune=vr4300", "-march=vr4300", "-mabi=32", "-fomit-frame-pointer", "-fno-toplevel-reorder", "-G0", "-c", "-nostdinc", "-I.", "-Iinclude2", "-Iinclude2/libc", "-DTARGET_N64", "-DF3DEX2_GBI", os.path.join(root, file)])
 				shutil.move("./" + file.replace(".c", ".o"), "obj/" + _o)
 print()
 
@@ -303,7 +303,7 @@ from n64crc import fixCRC
 fixCRC(newROMName)
 
 # Remove temporary .o files
-shutil.rmtree('obj')
+# shutil.rmtree('obj')
 
 end_time = time.time()
 with open(newROMName, "rb") as fh:
