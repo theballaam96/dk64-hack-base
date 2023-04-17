@@ -326,4 +326,33 @@
 .defineLabel LZFadeoutProgress, 0x807FD888 ; f32
 .defineLabel HUD, 0x80754280 ; u32 ptr
 
+; Tag Anywhere
+.definelabel LatestCollectedObject, 0x807FD734
+.definelabel CollectedObjects, 0x807FD730
+.definelabel hasTurnedInEnoughCBs, 0x805FF0C8
+.definelabel getWorld, 0x805FF030
+.definelabel tagKong, 0x806C8E58
+.definelabel clearGun, 0x806F0C18
+.definelabel clearTagSlide, 0x806CFF9C
+.definelabel removeGorillaGone, 0x806F12FC
+.definelabel cancelMusic, 0x80602B60
+.definelabel playAnimation, 0x80614E78
+.definelabel handleAnimation, 0x80614D90
+.definelabel assessFlagMapping, 0x807314F4
+.definelabel coinCBCollectHandle, 0x806F54E0
+.definelabel playSFXFromObject, 0x806085DC
+.definelabel displayItemOnHUD, 0x806F8BC4
+; Stack Trace
+.definelabel StackTraceX, 0x807FEF70
+.definelabel StackTraceY, 0x807FEF74
+.definelabel StackTraceSize, 0x807FEF78
+.definelabel StackTraceStartX, 0x807FEF7C
+.definelabel StackTraceAddresses, 0x807FEF80
+.definelabel ReasonExceptions, 0x80756360
+.definelabel ReasonCode, 0x807FF01C
+.definelabel ReasonValues, 0x807FF020
+.definelabel printDebugText, 0x80731D20
+.definelabel dumpReturns, 0x80732158
+.definelabel __osGetThreadId, 0x800078A0
+
 ; Hack data

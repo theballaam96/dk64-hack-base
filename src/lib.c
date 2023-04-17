@@ -1,5 +1,7 @@
 #include "../include/common.h"
 
+const s16 kong_flags[] = {385,6,70,66,117};
+
 void setPermanentFlag(s16 flagIndex) {
 	setFlag(flagIndex, 1, 0);
 }

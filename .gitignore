@@ -26,3 +26,7 @@ codec_test/*
 
 # Log Files
 *.log
+
+# N64Chain
+build/n64chain
+n64chain.zip
