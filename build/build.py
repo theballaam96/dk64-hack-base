@@ -28,7 +28,7 @@ if not os.path.exists("build/n64chain"):
         zip_ref.extractall("build/n64chain/")
 cwd = os.path.dirname(os.path.abspath(__file__))
 
-print("[1 / 8] - Compiling C Code")
+print("[1 / 9] - Compiling C Code")
 if os.path.exists("obj"):
 	shutil.rmtree('obj')
 os.mkdir("obj")
@@ -98,8 +98,37 @@ map_replacements = [
 # 		"map_folder": mapPath,
 # 	})
 
+from map_generator import generateMap
+generate_maps = False #Set to True to generate map files (advanced)
+
+#Generate map files created using Fast64 - https://github.com/Fast-64/fast64
+map_replacement_models = [
+	#{
+	#	"map_name": "example map file",
+	#	"path_to_model": "blender/example/",
+	#	"mesh_name": "lair_entrance",
+	#	"water_exists": "false",
+	#	"texture_index": 6013
+	#}
+]
+
+print("[2 / 9] - Generating map files")
+if generate_maps:
+	for map in map_replacement_models:
+		print("- Generating map file for " + map["map_name"] + ".")
+		if(os.path.exists(map["path_to_model"])):
+			if(os.path.isfile(map["path_to_model"] + "/model.c")):
+				generateMap(os.path.abspath(map["path_to_model"]),map["mesh_name"],map["water_exists"],str(map["texture_index"]))
+			else:
+				print("- Could not find model.c in specified path: "+map["path_to_model"])
+		else:
+			print("- Could not access specified path: " + map["path_to_model"])
+else:
+	print("- Map generation disabled. Set generate_maps to True in build.py to generate map files.")
+
+
 with open(ROMName, "rb") as fh:
-	print("[2 / 8] - Parsing pointer tables")
+	print("[3 / 9] - Parsing pointer tables")
 	parsePointerTables(fh)
 	readOverlayOriginalData(fh)
 
@@ -169,7 +198,7 @@ with open(ROMName, "rb") as fh:
 						"use_external_gzip": "use_external_gzip" in y and y["use_external_gzip"],
 					})
 
-	print("[3 / 8] - Extracting files from ROM")
+	print("[4 / 9] - Extracting files from ROM")
 	for x in file_dict:
 		# N64Tex conversions do not need to be extracted to disk from ROM
 		if "texture_format" in x:
@@ -207,14 +236,14 @@ with open(ROMName, "rb") as fh:
 					dec = zlib.decompress(byte_read, 15 + 32)
 					fg.write(dec)
 
-print("[4 / 8] - Patching Extracted Files")
+print("[5 / 9] - Patching Extracted Files")
 for x in file_dict:
 	if "patcher" in x and callable(x["patcher"]):
 		print(" - Running patcher for " + x["source_file"])
 		x["patcher"](x["source_file"])
 
 with open(newROMName, "r+b") as fh:
-	print("[5 / 8] - Writing patched files to ROM")
+	print("[6 / 9] - Writing patched files to ROM")
 	for x in file_dict:
 		if "texture_format" in x:
 			if x["texture_format"] in ["rgba5551", "i4", "ia4", "i8", "ia8"]:
@@ -288,11 +317,11 @@ with open(newROMName, "r+b") as fh:
 				if os.path.exists(x["source_file"]):
 					os.remove(x["source_file"])
 
-	print("[6 / 8] - Writing recomputed pointer tables to ROM")
+	print("[7 / 9] - Writing recomputed pointer tables to ROM")
 	writeModifiedPointerTablesToROM(fh)
 	writeModifiedOverlaysToROM(fh)
 
-	print("[7 / 8] - Dumping details of all pointer tables to rom/pointer_tables_modified.log")
+	print("[8 / 9] - Dumping details of all pointer tables to rom/pointer_tables_modified.log")
 	dumpPointerTableDetails("rom/pointer_tables_modified.log", fh)
 
 # For compatibility with real hardware, the ROM size needs to be aligned to 0x10 bytes
@@ -303,7 +332,7 @@ with open(newROMName, "r+b") as fh:
         for x in range(to_add):
             fh.write(bytes([0]))
 
-print("[8 / 8] - Generating BizHawk RAM watch")
+print("[9 / 9] - Generating BizHawk RAM watch")
 import generate_watch_file
 
 # Write custom ASM code to ROM
