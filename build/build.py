@@ -98,33 +98,43 @@ map_replacements = [
 # 		"map_folder": mapPath,
 # 	})
 
+##############################################################################
+#Generate map files created using Fast64 - https://github.com/Fast-64/fast64 #
+##############################################################################
 from map_generator import generateMap
 generate_maps = False #Set to True to generate map files (advanced)
 
-#Generate map files created using Fast64 - https://github.com/Fast-64/fast64
 map_replacement_models = [
-	#{
-	#	"map_name": "example map file",
-	#	"path_to_model": "blender/example/",
-	#	"mesh_name": "lair_entrance",
-	#	"water_exists": "false",
-	#	"texture_index": 6013
-	#}
+	{
+		"map_name": "example map file",
+		"path_to_model": "blender/example/",
+		"mesh_name": "lair_entrance",
+		"water_exists": "false",
+		#"texture_index": 6013
+	},
+	{
+		"map_name": "e3 demo",
+		"path_to_model": "blender/e3_demo/",
+		"mesh_name": "e3_demo",
+		"water_exists": "false",
+		#"texture_index": 6013
+	},
 ]
 
 print("[2 / 9] - Generating map files")
+index = 6013 #first unused texture index
 if generate_maps:
 	for map in map_replacement_models:
-		print("- Generating map file for " + map["map_name"] + ".")
+		print(" - Generating map file for " + map["map_name"] + ".")
 		if(os.path.exists(map["path_to_model"])):
 			if(os.path.isfile(map["path_to_model"] + "/model.c")):
-				generateMap(os.path.abspath(map["path_to_model"]),map["mesh_name"],map["water_exists"],str(map["texture_index"]))
+				index = generateMap(os.path.abspath(map["path_to_model"]),map["mesh_name"],map["water_exists"],index)
 			else:
-				print("- Could not find model.c in specified path: "+map["path_to_model"])
+				print(" - Could not find model.c in specified path: "+map["path_to_model"])
 		else:
-			print("- Could not access specified path: " + map["path_to_model"])
+			print(" - Could not access specified path: " + map["path_to_model"])
 else:
-	print("- Map generation disabled. Set generate_maps to True in build.py to generate map files.")
+	print(" - Map generation disabled. Set generate_maps to True in build.py to generate map files.")
 
 
 with open(ROMName, "rb") as fh:
