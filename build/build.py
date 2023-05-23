@@ -136,7 +136,6 @@ if generate_maps:
 else:
 	print(" - Map generation disabled. Set generate_maps to True in build.py to generate map files.")
 
-
 with open(ROMName, "rb") as fh:
 	print("[3 / 9] - Parsing pointer tables")
 	parsePointerTables(fh)
