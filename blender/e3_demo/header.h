@@ -1,0 +1,14 @@
+extern u64 e3_demo_CI4_0200D2D0_ci4[];
+extern u64 e3_demo_CI4_0200D2D0_ci4_pal_rgba16[];
+extern u64 e3_demo_CI4_0200B070_ci4[];
+extern u64 e3_demo_CI4_0200B070_ci4_pal_rgba16[];
+extern Vtx e3_demo_Walls_Stone_mesh_vtx_cull[8];
+extern Vtx e3_demo_Walls_Stone_mesh_vtx_0[50];
+extern Gfx e3_demo_Walls_Stone_mesh_tri_0[];
+extern Vtx e3_demo_Walls_Stone_mesh_vtx_1[386];
+extern Gfx e3_demo_Walls_Stone_mesh_tri_1[];
+extern Gfx mat_e3_demo_f3d_material_018[];
+extern Gfx mat_revert_e3_demo_f3d_material_018[];
+extern Gfx mat_e3_demo_f3d_material_017[];
+extern Gfx mat_revert_e3_demo_f3d_material_017[];
+extern Gfx e3_demo_Walls_Stone_mesh[];
