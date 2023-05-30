@@ -98,26 +98,43 @@ from map_generator import generateMap
 generate_maps = False #Set to True to generate map files (advanced)
 
 map_replacement_models = [
-	#{
-	#	"map_name": "spiral mountain",
-	#	"path_to_model": "blender/spiral/",
-	#	"mesh_name": "spiral_mountain",
-	#	"water_exists": "true",
-	#	"water_planes": [
-	#		{
-	#			"x1": 994,
-	#			"z1": 823,
-	#			"x2": 1615,
-	#			"z2": 1503,
-	#			"water_height": 47,
-	#			"red": 255,
-	#			"green": 255,
-	#			"blue": 250,
-	#			"alpha": 230,
-	#			"material_type": "water",
-	#		},
-	#	]
-	#},
+	# {
+		# "map_name": "spiral mountain",
+		# "path_to_model": "blender/spiral mountain/",
+		# "output_path": "maps/spiral_mountain",
+		# "mesh_name": "spiral_mountain",
+		# "water_exists": "true",
+		# "water_planes": [
+			# {
+				# "x1": 994,
+				# "z1": 823,
+				# "x2": 1615,
+				# "z2": 1503,
+				# "water_height": 60,
+				# "red": 255,
+				# "green": 255,
+				# "blue": 250,
+				# "alpha": 230,
+				# "material_type": "water",
+			# },
+		# ]
+	# },
+	# {
+		# "map_name": "banjo's house",
+		# "path_to_model": "blender/banjos_house/",
+		# "output_path": "maps/banjos_house",
+		# "mesh_name": "banjos_house",
+		# "water_exists": "false",
+		# "water_planes": []
+	# },
+	# {
+		# "map_name": "lair entrance",
+		# "path_to_model": "blender/lair entrance/",
+		# "output_path": "maps/lair_entrance",
+		# "mesh_name": "lair_entrance",
+		# "water_exists": "false",
+		# "water_planes": []
+	# },
 ]
 
 print("[2 / 9] - Generating map files")
@@ -127,7 +144,7 @@ if generate_maps:
 		print(" - Generating map file for " + map["map_name"] + ".")
 		if(os.path.exists(map["path_to_model"])):
 			if(os.path.isfile(map["path_to_model"] + "/model.c")):
-				index = generateMap(os.path.abspath(map["path_to_model"]),map["mesh_name"],map["water_exists"],map["water_planes"],index)
+				index = generateMap(os.path.abspath(map["path_to_model"]),os.path.abspath(map["output_path"]),map["mesh_name"],map["water_exists"],map["water_planes"],index)
 			else:
 				print(" - Could not find model.c in specified path: "+map["path_to_model"])
 		else:

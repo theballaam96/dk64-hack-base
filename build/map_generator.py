@@ -20,7 +20,7 @@ material_type = {
 	"sand_8": 8,
 }
 
-def generateMap(path : str, mesh_name : str, water_exists : str, water_planes : list, texture_index : int):
+def generateMap(path : str, output_path : str, mesh_name : str, water_exists : str, water_planes : list, texture_index : int):
 	if(os.path.exists(path+"/output")):
 		shutil.rmtree(path+"/output")
 	if(os.path.exists(path+"/obj")):
@@ -73,6 +73,8 @@ def generateMap(path : str, mesh_name : str, water_exists : str, water_planes : 
 		end_of_file += (8 - (end_of_file % 8))
 	dl_block = contents[(0x38+(verts*0x10)):end_of_file]
 	with open(path+"/obj/dl_and_verts.bin","wb") as output_file:
+		output_file.write(b'\xe7\x00\x00\x00\x00\x00\x00\x00') #E7 00 00 00 00 00 00 00 = pipe sync
+		output_file.write(b'\xd9\xff\xff\xff\x00\x00\x04\x01') #D9 FF FF FF 00 00 04 01 = z-buffering, cull back-facing tris
 		output_file.write(dl_block)
 		output_file.close()
 	with open(path+"/obj/dl_and_verts.bin","ab") as output_file:
@@ -136,7 +138,7 @@ def generateMap(path : str, mesh_name : str, water_exists : str, water_planes : 
 		geometry_header.write(data_pointer.to_bytes(4,'big'))
 		
 		number_of_planes = 0
-		if water_exists:
+		if water_exists == "true":
 			shutil.copy(f"{cwd}\\geometry\\geometry_material_block.bin",path+"/obj/geometry_material_block.bin")
 			for water_plane in water_planes:
 				number_of_planes+=1
@@ -157,6 +159,8 @@ def generateMap(path : str, mesh_name : str, water_exists : str, water_planes : 
 					material_block.write(water_plane["x2"].to_bytes(2,'big'))
 					material_block.seek(0x4C)
 					material_block.write(water_plane["z2"].to_bytes(2,'big'))
+					material_block.seek(0x4E)
+					material_block.write(water_plane["water_height"].to_bytes(2,'big'))
 					material_block.seek(0x61)
 					material_block.write(water_plane["red"].to_bytes(1,'big'))
 					material_block.seek(0x61)
@@ -206,7 +210,7 @@ def generateMap(path : str, mesh_name : str, water_exists : str, water_planes : 
 		
 		#chunk section start
 		geometry_header.seek(0x60)
-		if water_exists:
+		if water_exists == "true":
 			data_pointer+=0x4
 		else:
 			data_pointer+=0x10
@@ -216,12 +220,12 @@ def generateMap(path : str, mesh_name : str, water_exists : str, water_planes : 
 		data_pointer+=0
 		geometry_header.write(data_pointer.to_bytes(4,'big'))
 		
-		if water_exists:
+		if water_exists == "true":
 			shutil.copy(f"{cwd}\\geometry\\geometry_chunk_block.bin",path+"/obj/geometry_chunk_block.bin")
 			with open(path+"/obj/geometry_chunk_block.bin","r+b") as chunk_block:
 				#size of dl block
 				chunk_block.seek(0x14)
-				chunk_block.write((len(dl_block)+8).to_bytes(4,'big'))
+				chunk_block.write((len(dl_block)+0x18).to_bytes(4,'big')) #add 0x18 to the dl block size for the additional commands added above
 				
 				#size of vert block
 				chunk_block.seek(0x34)
@@ -240,16 +244,16 @@ def generateMap(path : str, mesh_name : str, water_exists : str, water_planes : 
 				chunk_block.close()
 			
 		geometry_header.seek(0x68)
-		if water_exists:
+		if water_exists == "true":
 			data_pointer+=0x4
 		else:
 			data_pointer+=0x10
 		geometry_header.write(data_pointer.to_bytes(4,'big'))
 		
 		geometry_header.seek(0x6C)
-		if water_exists:
+		if water_exists == "true":
 			data_pointer+=0x68
-		else
+		else:
 			data_pointer+=0
 		geometry_header.write(data_pointer.to_bytes(4,'big'))
 		
@@ -258,7 +262,7 @@ def generateMap(path : str, mesh_name : str, water_exists : str, water_planes : 
 		geometry_header.write(data_pointer.to_bytes(4,'big'))
 		
 		#water existing / chunks existing - needs to set a specific header byte from 1 to 2
-		if water_exists:
+		if water_exists == "true":
 			geometry_header.seek(0x130)
 			data = 2
 			geometry_header.write(data.to_bytes(1,'big'))
@@ -280,6 +284,20 @@ def generateMap(path : str, mesh_name : str, water_exists : str, water_planes : 
 				geometry_footer.close()
 				geometry_file_complete.write(contents)
 				geometry_file_complete.close()
+				
+	#copy geometry, walls, floors to output directory
+	if(not os.path.exists(output_path)):
+		os.mkdir(output_path)
+	shutil.copy(path+"/output/geometry.bin",output_path+"/geometry.bin")
+	shutil.copy(path+"/output/walls.bin",output_path+"/walls.bin")
+	shutil.copy(path+"/output/floors.bin",output_path+"/floors.bin")
+	
+	#copy textures to bin
+	if(not os.path.exists("bin/"+mesh_name)):
+		shutil.copytree(path+"/output/textures/"+mesh_name,"bin/"+mesh_name)
+	else:
+		shutil.rmtree("bin/"+mesh_name)
+		shutil.copytree(path+"/output/textures/"+mesh_name,"bin/"+mesh_name)
 	
 	#open model header to get number of textures
 	model_file = open(path+"/header.h")
