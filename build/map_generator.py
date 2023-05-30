@@ -206,7 +206,10 @@ def generateMap(path : str, mesh_name : str, water_exists : str, water_planes : 
 		
 		#chunk section start
 		geometry_header.seek(0x60)
-		data_pointer+=0x4
+		if water_exists:
+			data_pointer+=0x4
+		else:
+			data_pointer+=0x10
 		geometry_header.write(data_pointer.to_bytes(4,'big'))
 		
 		geometry_header.seek(0x64)
@@ -237,11 +240,17 @@ def generateMap(path : str, mesh_name : str, water_exists : str, water_planes : 
 				chunk_block.close()
 			
 		geometry_header.seek(0x68)
-		data_pointer+=0x4
+		if water_exists:
+			data_pointer+=0x4
+		else:
+			data_pointer+=0x10
 		geometry_header.write(data_pointer.to_bytes(4,'big'))
 		
 		geometry_header.seek(0x6C)
-		data_pointer+=0x68
+		if water_exists:
+			data_pointer+=0x68
+		else
+			data_pointer+=0
 		geometry_header.write(data_pointer.to_bytes(4,'big'))
 		
 		geometry_header.seek(0x70)
