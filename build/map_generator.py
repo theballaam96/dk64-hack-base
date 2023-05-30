@@ -6,11 +6,30 @@ import subprocess
 import hashlib
 import requests
 import zipfile
+from typing import List, Dict
 
-def generateMap(path : str, mesh_name : str, water_exists : str, texture_index : int):
+material_type = {
+	"water_0": 0,
+	"bright_lava": 1,
+	"yellow-green": 2,
+	"water": 3,
+	"sand": 4,
+	"orange_yellow_lava": 5,
+	"moving_green_goo": 6,
+	"hot_water": 7,
+	"sand_8": 8,
+}
+
+def generateMap(path : str, mesh_name : str, water_exists : str, water_planes : list, texture_index : int):
+	if(os.path.exists(path+"/output")):
+		shutil.rmtree(path+"/output")
+	if(os.path.exists(path+"/obj")):
+		shutil.rmtree(path+"/obj")
+	
 	print('Starting texture index '+str(texture_index))
-	if(not os.path.exists(path+"/output")):
-		os.mkdir(path+"/output")
+	
+	os.mkdir(path+"/output")
+	
 	result = subprocess.run(['java', '-cp', './build/dk64maps.jar', 'map_generator.MapGenerator', path+"/model.c", path+"/output", mesh_name, water_exists, str(texture_index)], stdout=subprocess.PIPE)
 	result = result.stdout.decode('utf-8')
 	print(result)
@@ -31,8 +50,7 @@ def generateMap(path : str, mesh_name : str, water_exists : str, texture_index :
 	
 	#compile model file with mips64-elf-gcc
 	cwd = os.path.dirname(os.path.abspath(__file__))
-	if os.path.exists(path+"/obj"):
-		shutil.rmtree(path+"/obj")
+	
 	os.mkdir(path+"/obj")
 	for root, dirs, files in os.walk(path):
 		for file in files:
@@ -112,12 +130,66 @@ def generateMap(path : str, mesh_name : str, water_exists : str, texture_index :
 		data_pointer+=4
 		geometry_header.write(data_pointer.to_bytes(4,'big'))
 		
+		#water plane block pointer
 		geometry_header.seek(0x4C)
 		data_pointer+=4
 		geometry_header.write(data_pointer.to_bytes(4,'big'))
 		
+		number_of_planes = 0
+		if water_exists:
+			shutil.copy(f"{cwd}\\geometry\\geometry_material_block.bin",path+"/obj/geometry_material_block.bin")
+			for water_plane in water_planes:
+				number_of_planes+=1
+				with open(path+"/obj/geometry_material_block.bin","r+b") as material_block:
+					#0x46 = x1
+					#0x48 = z1
+					#0x4A = x2
+					#0x4C = z2
+					#0x4E = water plane height
+					#0x60 = damage type
+					#0x61 - 0x64 = rgba (u8)
+					#0x66 - material type
+					material_block.seek(0x46)
+					material_block.write(water_plane["x1"].to_bytes(2,'big'))
+					material_block.seek(0x48)
+					material_block.write(water_plane["z1"].to_bytes(2,'big'))
+					material_block.seek(0x4A)
+					material_block.write(water_plane["x2"].to_bytes(2,'big'))
+					material_block.seek(0x4C)
+					material_block.write(water_plane["z2"].to_bytes(2,'big'))
+					material_block.seek(0x61)
+					material_block.write(water_plane["red"].to_bytes(1,'big'))
+					material_block.seek(0x61)
+					material_block.write(water_plane["green"].to_bytes(1,'big'))	
+					material_block.seek(0x61)
+					material_block.write(water_plane["blue"].to_bytes(1,'big'))	
+					material_block.seek(0x61)
+					material_block.write(water_plane["alpha"].to_bytes(1,'big'))
+					material_block.seek(0x66)
+					material_block.write(material_type[water_plane["material_type"]].to_bytes(1,'big'))
+					material_block.close()
+				
+				with open(f"{cwd}\\geometry\\geometry_footer.bin","rb") as original_footer:
+					with open(path+"/obj/geometry_footer.bin","wb+") as geometry_footer:
+						for i in range(0xC):
+							b = original_footer.read(1)
+							geometry_footer.write(b)
+						geometry_footer.write(number_of_planes.to_bytes(4,'big'))
+						with open(path+"/obj/geometry_material_block.bin","rb") as material_block:
+							geometry_footer.seek(0x10 + 0x6C * (number_of_planes - 1))
+							for i in range(0x6C):
+								b = material_block.read(1)
+								geometry_footer.write(b)
+							material_block.close()
+						original_footer.seek(0x10)
+						for i in range(0x34):
+							b = original_footer.read(1)
+							geometry_footer.write(b)
+						geometry_footer.close()
+					original_footer.close()
+
 		geometry_header.seek(0x50)
-		data_pointer+=4
+		data_pointer+= (4 + number_of_planes * 0x6C)
 		geometry_header.write(data_pointer.to_bytes(4,'big'))
 		
 		geometry_header.seek(0x54)
@@ -132,25 +204,64 @@ def generateMap(path : str, mesh_name : str, water_exists : str, texture_index :
 		data_pointer+=4
 		geometry_header.write(data_pointer.to_bytes(4,'big'))
 		
+		#chunk section start
 		geometry_header.seek(0x60)
-		data_pointer+=0x10
+		if water_exists:
+			data_pointer+=0x4
+		else:
+			data_pointer+=0x10
 		geometry_header.write(data_pointer.to_bytes(4,'big'))
 		
 		geometry_header.seek(0x64)
 		data_pointer+=0
 		geometry_header.write(data_pointer.to_bytes(4,'big'))
 		
+		if water_exists:
+			shutil.copy(f"{cwd}\\geometry\\geometry_chunk_block.bin",path+"/obj/geometry_chunk_block.bin")
+			with open(path+"/obj/geometry_chunk_block.bin","r+b") as chunk_block:
+				#size of dl block
+				chunk_block.seek(0x14)
+				chunk_block.write((len(dl_block)+8).to_bytes(4,'big'))
+				
+				#size of vert block
+				chunk_block.seek(0x34)
+				chunk_block.write((len(vert_block)).to_bytes(4,'big'))
+				
+				chunk_block.seek(0)
+				with open(path+"/obj/geometry_footer.bin","r+b") as geometry_footer:
+					geometry_footer.seek(0x10 + 0x6C * number_of_planes + 0x10)
+					for i in range(0x6C):
+						b = chunk_block.read(1)
+						geometry_footer.write(b)
+					for i in range(0x8):
+						b = b'\x00'
+						geometry_footer.write(b)
+					geometry_footer.close()
+				chunk_block.close()
+			
 		geometry_header.seek(0x68)
-		data_pointer+=0x10
+		if water_exists:
+			data_pointer+=0x4
+		else:
+			data_pointer+=0x10
 		geometry_header.write(data_pointer.to_bytes(4,'big'))
 		
 		geometry_header.seek(0x6C)
-		data_pointer+=0
+		if water_exists:
+			data_pointer+=0x68
+		else
+			data_pointer+=0
 		geometry_header.write(data_pointer.to_bytes(4,'big'))
 		
 		geometry_header.seek(0x70)
 		data_pointer+=4
 		geometry_header.write(data_pointer.to_bytes(4,'big'))
+		
+		#water existing / chunks existing - needs to set a specific header byte from 1 to 2
+		if water_exists:
+			geometry_header.seek(0x130)
+			data = 2
+			geometry_header.write(data.to_bytes(1,'big'))
 		
 		geometry_header.close()
 		
