@@ -65,17 +65,10 @@ file_dict = [
 		"source_file": "bin/StaticCode.bin",
 		"use_external_gzip": True,
 		"patcher": patchStaticCode,
-	},
+	}
 ]
 
 map_replacements = [
-	# {
-	# 	"name": "Test Map",
-	# 	"map_index": 0,
-	# 	# "map_folder": "maps/208 - Bloopers_Ending/"
-	# 	# "map_folder": "maps/38 - Angry_Aztec/"
-	# 	"map_folder": "maps/path_test/"
-	# },
 	# {
 	# 	"name": "Fairy Island Exit Test",
 	# 	"map_index": 189,
@@ -105,20 +98,26 @@ from map_generator import generateMap
 generate_maps = False #Set to True to generate map files (advanced)
 
 map_replacement_models = [
-	{
-		"map_name": "example map file",
-		"path_to_model": "blender/example/",
-		"mesh_name": "lair_entrance",
-		"water_exists": "false",
-		#"texture_index": 6013
-	},
-	{
-		"map_name": "e3 demo",
-		"path_to_model": "blender/e3_demo/",
-		"mesh_name": "e3_demo",
-		"water_exists": "false",
-		#"texture_index": 6013
-	},
+	#{
+	#	"map_name": "spiral mountain",
+	#	"path_to_model": "blender/spiral/",
+	#	"mesh_name": "spiral_mountain",
+	#	"water_exists": "true",
+	#	"water_planes": [
+	#		{
+	#			"x1": 994,
+	#			"z1": 823,
+	#			"x2": 1615,
+	#			"z2": 1503,
+	#			"water_height": 47,
+	#			"red": 255,
+	#			"green": 255,
+	#			"blue": 250,
+	#			"alpha": 230,
+	#			"material_type": "water",
+	#		},
+	#	]
+	#},
 ]
 
 print("[2 / 9] - Generating map files")
@@ -128,7 +127,7 @@ if generate_maps:
 		print(" - Generating map file for " + map["map_name"] + ".")
 		if(os.path.exists(map["path_to_model"])):
 			if(os.path.isfile(map["path_to_model"] + "/model.c")):
-				index = generateMap(os.path.abspath(map["path_to_model"]),map["mesh_name"],map["water_exists"],index)
+				index = generateMap(os.path.abspath(map["path_to_model"]),map["mesh_name"],map["water_exists"],map["water_planes"],index)
 			else:
 				print(" - Could not find model.c in specified path: "+map["path_to_model"])
 		else:
