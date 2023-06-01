@@ -65,7 +65,7 @@ file_dict = [
 		"source_file": "bin/StaticCode.bin",
 		"use_external_gzip": True,
 		"patcher": patchStaticCode,
-	},
+	}
 ]
 
 map_replacements = [
