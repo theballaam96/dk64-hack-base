@@ -70,13 +70,6 @@ file_dict = [
 
 map_replacements = [
 	# {
-	# 	"name": "Test Map",
-	# 	"map_index": 0,
-	# 	# "map_folder": "maps/208 - Bloopers_Ending/"
-	# 	# "map_folder": "maps/38 - Angry_Aztec/"
-	# 	"map_folder": "maps/path_test/"
-	# },
-	# {
 	# 	"name": "Fairy Island Exit Test",
 	# 	"map_index": 189,
 	# 	"map_folder": "maps/exit_test/"
@@ -98,34 +91,87 @@ map_replacements = [
 # 		"map_folder": mapPath,
 # 	})
 
+##############################################################################
+#Generate map files created using Fast64 - https://github.com/Fast-64/fast64 #
+##############################################################################
 from map_generator import generateMap
 generate_maps = False #Set to True to generate map files (advanced)
 
-#Generate map files created using Fast64 - https://github.com/Fast-64/fast64
 map_replacement_models = [
-	#{
-	#	"map_name": "example map file",
-	#	"path_to_model": "blender/example/",
-	#	"mesh_name": "lair_entrance",
-	#	"water_exists": "false",
-	#	"texture_index": 6013
-	#}
+	# {
+		# "map_name": "spiral mountain",
+		# "map_index": 175,
+		# "path_to_model": "blender/spiral mountain/",
+		# "output_path": "maps/spiral_mountain",
+		# "mesh_name": "spiral_mountain",
+		# "water_exists": "true",
+		# "water_planes": [
+			# {
+				# "x1": 994,
+				# "z1": 823,
+				# "x2": 1615,
+				# "z2": 1503,
+				# "water_height": 60,
+				# "red": 255,
+				# "green": 255,
+				# "blue": 250,
+				# "alpha": 230,
+				# "material_type": "water",
+			# },
+		# ]
+	# },
+	# {
+		# "map_name": "banjo's house",
+		# "map_index": 169,
+		# "path_to_model": "blender/banjos_house/",
+		# "output_path": "maps/banjos_house",
+		# "mesh_name": "banjos_house",
+		# "water_exists": "false",
+		# "water_planes": []
+	# },
+	# {
+		# "map_name": "lair entrance",
+		# "map_index": 173,
+		# "path_to_model": "blender/lair entrance/",
+		# "output_path": "maps/lair_entrance",
+		# "mesh_name": "lair_entrance",
+		# "water_exists": "false",
+		# "water_planes": []
+	# },
 ]
 
 print("[2 / 9] - Generating map files")
+index = 6013 #first unused texture index
 if generate_maps:
 	for map in map_replacement_models:
-		print("- Generating map file for " + map["map_name"] + ".")
+		print(" - Generating map file for " + map["map_name"] + ".")
 		if(os.path.exists(map["path_to_model"])):
 			if(os.path.isfile(map["path_to_model"] + "/model.c")):
-				generateMap(os.path.abspath(map["path_to_model"]),map["mesh_name"],map["water_exists"],str(map["texture_index"]))
+				index = generateMap(os.path.abspath(map["path_to_model"]),os.path.abspath(map["output_path"]),map["mesh_name"],map["water_exists"],map["water_planes"],index)
 			else:
-				print("- Could not find model.c in specified path: "+map["path_to_model"])
+				print(" - Could not find model.c in specified path: "+map["path_to_model"])
 		else:
-			print("- Could not access specified path: " + map["path_to_model"])
+			print(" - Could not access specified path: " + map["path_to_model"])
+	
+		#process model and add entry to map_replacements dict
+		replacement = [
+			{
+				"name": map["map_name"],
+				"map_index": map["map_index"],
+				"map_folder": map["output_path"]
+			}
+		]
+		map_replacements += replacement
+	
+	#process all main pointer table asset replacements and put them in file_dict
+	for root, dirs, files in os.walk(r'bin/build_imports'):
+		for file in files:
+			if file.endswith('.txt'):
+				imports = open("bin/build_imports/"+file,"r").read()
+				import_list = eval(imports)
+				file_dict += import_list #merge import txt with file_dict
 else:
-	print("- Map generation disabled. Set generate_maps to True in build.py to generate map files.")
-
+	print(" - Map generation disabled. Set generate_maps to True in build.py to generate map files.")
 
 with open(ROMName, "rb") as fh:
 	print("[3 / 9] - Parsing pointer tables")
