@@ -298,6 +298,21 @@ def generateMap(path : str, output_path : str, mesh_name : str, water_exists : s
 	else:
 		shutil.rmtree("bin/"+mesh_name)
 		shutil.copytree(path+"/output/textures/"+mesh_name,"bin/"+mesh_name)
+		
+	#copy build imports to bin/build_imports
+	if(not os.path.exists("bin/build_imports/")):
+		os.mkdir("bin/build_imports/")
+	else:
+		shutil.rmtree("bin/build_imports")
+		os.mkdir("bin/build_imports")
+	with open("bin/build_imports/"+mesh_name+".txt","w") as imports:
+		with open(path+"/output/build_imports.txt","r") as build_imports:
+			contents = build_imports.read()
+			imports.write("[\n")
+			imports.write(contents)
+			imports.write("]")
+			build_imports.close()
+			imports.close()
 	
 	#open model header to get number of textures
 	model_file = open(path+"/header.h")

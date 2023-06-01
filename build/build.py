@@ -100,6 +100,7 @@ generate_maps = False #Set to True to generate map files (advanced)
 map_replacement_models = [
 	# {
 		# "map_name": "spiral mountain",
+		# "map_index": 175,
 		# "path_to_model": "blender/spiral mountain/",
 		# "output_path": "maps/spiral_mountain",
 		# "mesh_name": "spiral_mountain",
@@ -121,6 +122,7 @@ map_replacement_models = [
 	# },
 	# {
 		# "map_name": "banjo's house",
+		# "map_index": 169,
 		# "path_to_model": "blender/banjos_house/",
 		# "output_path": "maps/banjos_house",
 		# "mesh_name": "banjos_house",
@@ -129,6 +131,7 @@ map_replacement_models = [
 	# },
 	# {
 		# "map_name": "lair entrance",
+		# "map_index": 173,
 		# "path_to_model": "blender/lair entrance/",
 		# "output_path": "maps/lair_entrance",
 		# "mesh_name": "lair_entrance",
@@ -149,6 +152,24 @@ if generate_maps:
 				print(" - Could not find model.c in specified path: "+map["path_to_model"])
 		else:
 			print(" - Could not access specified path: " + map["path_to_model"])
+	
+		#process model and add entry to map_replacements dict
+		replacement = [
+			{
+				"name": map["map_name"],
+				"map_index": map["map_index"],
+				"map_folder": map["output_path"]
+			}
+		]
+		map_replacements += replacement
+	
+	#process all main pointer table asset replacements and put them in file_dict
+	for root, dirs, files in os.walk(r'bin/build_imports'):
+		for file in files:
+			if file.endswith('.txt'):
+				imports = open("bin/build_imports/"+file,"r").read()
+				import_list = eval(imports)
+				file_dict += import_list #merge import txt with file_dict
 else:
 	print(" - Map generation disabled. Set generate_maps to True in build.py to generate map files.")
 
