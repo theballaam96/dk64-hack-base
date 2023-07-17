@@ -49,6 +49,8 @@ extern void displayItemOnHUD(s32 item, s32 unk0, s32 unk1);
 extern s32 printDebugText(char* string, s32 v1, s32 v2, s32 v3, s32 v4);
 extern void dumpReturns(void* info);
 extern s32 __osGetThreadId(void* thread);
+extern void setAction(int action, void* actor, int player_index);
+extern void handlePoleGrabbing(void* actor, int player_index, int allow_vines);
 
 // Vanilla data
 extern f32 TransitionSpeed;

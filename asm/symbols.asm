@@ -342,6 +342,8 @@
 .definelabel coinCBCollectHandle, 0x806F54E0
 .definelabel playSFXFromObject, 0x806085DC
 .definelabel displayItemOnHUD, 0x806F8BC4
+.definelabel handlePoleGrabbing, 0x8072F230
+.definelabel setAction, 0x806EB0C0
 ; Stack Trace
 .definelabel StackTraceX, 0x807FEF70
 .definelabel StackTraceY, 0x807FEF74

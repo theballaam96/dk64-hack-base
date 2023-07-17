@@ -6,4 +6,13 @@ void cFuncLoop(void) {
 	*/
 	initHack(); // Initialize hack
 	tagAnywhere(); // Tag Anywhere every frame functions
+	if (grab_lock_timer >= 0) {
+		grab_lock_timer += 1;
+		if (grab_lock_timer > 10) {
+			grab_lock_timer = -1;
+		}
+	}
+	if (tag_locked) {
+		tag_locked = 0;
+	}
 }

@@ -14,6 +14,9 @@
 
 #define TAG_ANYWHERE_KONG_LIMIT 5 // Amount of kongs in the TA Loop
 
+char grab_lock_timer = 0;
+char tag_locked = 0;
+
 static const map_bitfield banned_map_btf = {
     // Bitfield on whether a tag is enabled in a map. Each property is a boolean
 
@@ -430,6 +433,9 @@ int canTagAnywhere(void) {
     if (ModelTwoTouchCount > 0) {
         return 0;
     }
+    if (tag_locked) {
+        return 0;
+    }
     if (CurrentMap == MAP_TROFFNSCOFF) {
         if (MapState & 0x10) {
             return 0;
@@ -659,6 +665,7 @@ void tagAnywhere(void) {
                     }
                     // Perform the tag
                     int old_control_state = Player->control_state;
+                    grab_lock_timer = 0; // Restart countdown
                     tagKong(next_character + 2);
                     clearTagSlide(Player);
                     if (old_control_state == 0x4F) {
@@ -782,4 +789,20 @@ void tagAnywhereBunch(int player, int obj, int player_index) {
         id = LatestCollectedObject->id;
     }
     populateSFXCache(0x2A0,64,5,3,id,0);
+}
+
+void handleGrabbingLock(void* player, int player_index, int allow_vines) {
+    /**
+     * @brief Block grabbing trees for 2 frames after a tag
+     * 
+     */
+    if ((grab_lock_timer >= 0) && (grab_lock_timer < 2)) {
+        return;
+    }
+    handlePoleGrabbing(player, player_index, allow_vines);
+}
+
+void handleActionSet(int action, void* actor, int player_index) {
+    tag_locked = 1;
+    setAction(action, actor, player_index);
 }

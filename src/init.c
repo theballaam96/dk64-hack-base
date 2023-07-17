@@ -24,6 +24,13 @@ void initHack(void) {
         *(int*)(0x806F6CB0) = 0x86060002; // LH $a2, 0x2 ($s0)
         *(int*)(0x806F6CB4) = 0x0C000000 | (((int)&tagAnywhereInit & 0xFFFFFF) >> 2);
         *(int*)(0x806F53AC) = 0; // Prevent LZ case
+        // Minor Bug Fixes
+        grab_lock_timer = -1;
+        tag_locked = 0;
+        writeFunction(0x8072F1E8, &handleGrabbingLock);
+        writeFunction(0x8072F458, &handleActionSet); // Actor grabbables
+        writeFunction(0x8072F46C, &handleActionSet); // Model 2 grabbables
+        writeFunction(0x806CFC64, &handleActionSet); // Ledge Grabbing
         // FINISH
         initialized = 1;
     }
