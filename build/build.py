@@ -99,12 +99,12 @@ generate_maps = False #Set to True to generate map files (advanced)
 
 map_replacement_models = [
 	# {
-		# "map_name": "spiral mountain",
+		# "map_name": "comet observatory",
 		# "map_index": 175,
-		# "path_to_model": "blender/spiral mountain/",
-		# "output_path": "maps/spiral_mountain",
-		# "mesh_name": "spiral_mountain",
-		# "water_exists": "true",
+		# "path_to_model": "blender/comet observatory/",
+		# "output_path": "maps/comet_observatory",
+		# "mesh_name": "comet_observatory",
+		# "water_exists": "false",
 		# "water_planes": [
 			# {
 				# "x1": 994,
@@ -121,11 +121,11 @@ map_replacement_models = [
 		# ]
 	# },
 	# {
-		# "map_name": "banjo's house",
+		# "map_name": "Bedroom",
 		# "map_index": 169,
-		# "path_to_model": "blender/banjos_house/",
-		# "output_path": "maps/banjos_house",
-		# "mesh_name": "banjos_house",
+		# "path_to_model": "blender/bedroom/",
+		# "output_path": "maps/bedroom",
+		# "mesh_name": "bedroom",
 		# "water_exists": "false",
 		# "water_planes": []
 	# },
