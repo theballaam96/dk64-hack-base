@@ -10,6 +10,7 @@ Tools contained:
 * ARMIPS: Writing custom code in C or MIPS Assembler
 * N64Tex: Converting PNGs into image formats supported by the N64 (RGBA16, i4, i8, ia4, ia8)
 * Flips: CLI for creating BPS Patches
+* [DK64MapGenerator](https://github.com/GloriousLiar/DK64MapGenerator/): Custom tool to build map files using Fast64 Blender plug-in
 
 ## Building Pre-Requisites
 * Python 3
