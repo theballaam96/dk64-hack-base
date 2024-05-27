@@ -7,6 +7,7 @@ import hashlib
 import requests
 import zipfile
 from typing import List, Dict
+from pathlib import Path
 
 material_type = {
 	"water_0": 0,
@@ -302,9 +303,9 @@ def generateMap(path : str, output_path : str, mesh_name : str, water_exists : s
 	#copy build imports to bin/build_imports
 	if(not os.path.exists("bin/build_imports/")):
 		os.mkdir("bin/build_imports/")
-	else:
-		shutil.rmtree("bin/build_imports")
-		os.mkdir("bin/build_imports")
+	import_file = Path("bin/build_imports/"+mesh_name+".txt")
+	if(import_file.is_file()):
+		os.remove(import_file)
 	with open("bin/build_imports/"+mesh_name+".txt","w") as imports:
 		with open(path+"/output/build_imports.txt","r") as build_imports:
 			contents = build_imports.read()
